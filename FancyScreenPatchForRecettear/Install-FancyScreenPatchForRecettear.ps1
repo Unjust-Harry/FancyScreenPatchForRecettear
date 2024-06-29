@@ -513,6 +513,9 @@ Param (
 			$HideItemDetailsControlReminderInItemMenus,
 
 	[Parameter()]
+			$DisableBlackBars,
+
+	[Parameter()]
 		[ValidateSet('eng', 'jpn')]
 		[ArgumentCompleter({'eng', 'jpn' | ForEach-Object {$_}})]
 			$GameLanguageOverride,
@@ -969,6 +972,7 @@ function Resolve-Configuration
 		Coerce-Parameter HideSkipEventControlReminder ([Bool]) 'true or false'
 		Coerce-Parameter HideItemDetailsControlReminderWhenHaggling ([Bool]) 'true or false'
 		Coerce-Parameter HideItemDetailsControlReminderInItemMenus ([Bool]) 'true or false'
+		Coerce-Parameter DisableBlackBars ([Bool]) 'true or false'
 		Coerce-Parameter SkipPatching ([Bool]) 'true or false'
 		Coerce-Parameter SkipPostPatchOperations ([Bool]) 'true or false'
 		Coerce-Parameter GetGameWindowMode ([Bool]) 'true or false'
@@ -1119,6 +1123,11 @@ function Resolve-Configuration
 	if ($Null -eq $Script:HideItemDetailsControlReminderInItemMenus)
 	{
 		$Script:HideItemDetailsControlReminderInItemMenus = $False
+	}
+
+	if ($Null -eq $Script:DisableBlackBars)
+	{
+		$Script:DisableBlackBars = $False
 	}
 
 	$Script:UsingIntegral2DScaling = $Script:UseIntegral2DScaling -eq $True
@@ -1882,6 +1891,7 @@ if ($Null -ne $Script:Configuration)
 	if ($Null -eq $Script:HideSkipEventControlReminder -and $Null -ne $Script:Configuration.HideSkipEventControlReminder) {$Script:HideSkipEventControlReminder = [Bool] $Script:Configuration.HideSkipEventControlReminder}
 	if ($Null -eq $Script:HideItemDetailsControlReminderWhenHaggling -and $Null -ne $Script:Configuration.HideItemDetailsControlReminderWhenHaggling) {$Script:HideItemDetailsControlReminderWhenHaggling = [Bool] $Script:Configuration.HideItemDetailsControlReminderWhenHaggling}
 	if ($Null -eq $Script:HideItemDetailsControlReminderInItemMenus -and $Null -ne $Script:Configuration.HideItemDetailsControlReminderInItemMenus) {$Script:HideItemDetailsControlReminderInItemMenus = [Bool] $Script:Configuration.HideItemDetailsControlReminderInItemMenus}
+	if ($Null -eq $Script:DisableBlackBars -and $Null -ne $Script:Configuration.DisableBlackBars) {$Script:DisableBlackBars = [Bool] $Script:Configuration.DisableBlackBars}
 	if ($Null -eq $Script:SkipPatching -and $Null -ne $Script:Configuration.SkipPatching) {$Script:SkipPatching = [Bool] $Script:Configuration.SkipPatching}
 	if ($Null -eq $Script:SkipPostPatchOperations -and $Null -ne $Script:Configuration.SkipPostPatchOperations) {$Script:SkipPostPatchOperations = [Bool] $Script:Configuration.SkipPostPatchOperations}
 	if ($Null -eq $Script:GetGameWindowMode -and $Null -ne $Script:Configuration.GetGameWindowMode) {$Script:GetGameWindowMode = [Bool] $Script:Configuration.GetGameWindowMode}
@@ -1982,6 +1992,7 @@ function New-ConfigurationHashTable ($TapBefore)
 	$Object.HideSkipEventControlReminder = $Script:HideSkipEventControlReminder
 	$Object.HideItemDetailsControlReminderWhenHaggling = $Script:HideItemDetailsControlReminderWhenHaggling
 	$Object.HideItemDetailsControlReminderInItemMenus = $Script:HideItemDetailsControlReminderInItemMenus
+	$Object.DisableBlackBars = $Script:DisableBlackBars
 	$Object.SkipPatching = $Script:SkipPatching
 	$Object.SkipPostPatchOperations = $Script:SkipPostPatchOperations
 	$Object.GetGameWindowMode = $Script:GetGameWindowMode
@@ -2694,6 +2705,7 @@ Use-Disposable $(
 			$Script:HideSkipEventControlReminder = if ($Null -ne $ConfigurationObject.HideSkipEventControlReminder) {[Bool] $ConfigurationObject.HideSkipEventControlReminder}
 			$Script:HideItemDetailsControlReminderWhenHaggling = if ($Null -ne $ConfigurationObject.HideItemDetailsControlReminderWhenHaggling) {[Bool] $ConfigurationObject.HideItemDetailsControlReminderWhenHaggling}
 			$Script:HideItemDetailsControlReminderInItemMenus = if ($Null -ne $ConfigurationObject.HideItemDetailsControlReminderInItemMenus) {[Bool] $ConfigurationObject.HideItemDetailsControlReminderInItemMenus}
+			$Script:DisableBlackBars = if ($Null -ne $ConfigurationObject.DisableBlackBars) {[Bool] $ConfigurationObject.DisableBlackBars}
 			$Script:MobDrawDistancePatchVariant = if ($Null -ne $ConfigurationObject.MobDrawDistancePatchVariant) {[String] $ConfigurationObject.MobDrawDistancePatchVariant}
 			$Script:SkipPatching = if ($Null -ne $ConfigurationObject.SkipPatching) {[Bool] $ConfigurationObject.SkipPatching}
 			$Script:SkipPostPatchOperations = if ($Null -ne $ConfigurationObject.SkipPostPatchOperations) {[Bool] $ConfigurationObject.SkipPostPatchOperations}
@@ -5422,6 +5434,7 @@ Recettear is being patched as follows:
 	HideSkipEventControlReminder: $Script:HideSkipEventControlReminder
 	HideItemDetailsControlReminderWhenHaggling: $Script:HideItemDetailsControlReminderWhenHaggling
 	HideItemDetailsControlReminderInItemMenus: $Script:HideItemDetailsControlReminderInItemMenus
+	DisableBlackBars: $Script:DisableBlackBars
 	FloatInterpolation: $(
 		foreach ($Float in $InterpolatedFloatConfiguration.GetEnumerator())
 		{
@@ -10233,18 +10246,21 @@ Recettear is being patched as follows:
 						0xC3                                                                  <# ret #>
 					)
 
-					Hijack 'DrawBlackBarsOverMostThings' 'PresentFrame' 1248 6 @(
-						0x83, (ModRM 0 7 5), '&GameStateB', 0x09                   <# cmp [&GameStateB], 9 #>
-						0x75, '1:DrawingOfBlackBarsOverMostThings'                 <# jne DrawingOfBlackBarsOverMostThings #>
-						0x83, (ModRM 0 7 5), '&ShouldDisplayEndOfDaySummary', 0x00 <# cmp [&ShouldDisplayEndOfDaySummary], 0 #>
-						0x74, '1:PostDrawingOfBlackBarsOverMostThings'             <# jz PostDrawingOfBlackBarsOverMostThings #>
-						0x83, (ModRM 0 7 5), '&InAnEvent?', 0x00                   <# cmp [&InAnEvent?], 0 #>
-						0x74, '1:PostDrawingOfBlackBarsOverMostThings'             <# jz PostDrawingOfBlackBarsOverMostThings #>
-					'DrawingOfBlackBarsOverMostThings:'
-						0xE8, '4:DrawBlackBars'                                    <# call DrawBlackBars #>
-					'PostDrawingOfBlackBarsOverMostThings:'
-						0x39, (ModRM 0 6 5), '&ShouldDisplayFPSOSD'                <# cmp [&ShouldDisplayFPSOSD], esi #>
-					)
+					if (-not $Script:DisableBlackBars)
+					{
+						Hijack 'DrawBlackBarsOverMostThings' 'PresentFrame' 1248 6 @(
+							0x83, (ModRM 0 7 5), '&GameStateB', 0x09                   <# cmp [&GameStateB], 9 #>
+							0x75, '1:DrawingOfBlackBarsOverMostThings'                 <# jne DrawingOfBlackBarsOverMostThings #>
+							0x83, (ModRM 0 7 5), '&ShouldDisplayEndOfDaySummary', 0x00 <# cmp [&ShouldDisplayEndOfDaySummary], 0 #>
+							0x74, '1:PostDrawingOfBlackBarsOverMostThings'             <# jz PostDrawingOfBlackBarsOverMostThings #>
+							0x83, (ModRM 0 7 5), '&InAnEvent?', 0x00                   <# cmp [&InAnEvent?], 0 #>
+							0x74, '1:PostDrawingOfBlackBarsOverMostThings'             <# jz PostDrawingOfBlackBarsOverMostThings #>
+						'DrawingOfBlackBarsOverMostThings:'
+							0xE8, '4:DrawBlackBars'                                    <# call DrawBlackBars #>
+						'PostDrawingOfBlackBarsOverMostThings:'
+							0x39, (ModRM 0 6 5), '&ShouldDisplayFPSOSD'                <# cmp [&ShouldDisplayFPSOSD], esi #>
+						)
+					}
 
 					if ($Script:UsingIntegral2DScaling)
 					{
