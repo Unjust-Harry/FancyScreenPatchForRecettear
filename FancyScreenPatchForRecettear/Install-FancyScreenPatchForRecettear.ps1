@@ -10540,6 +10540,62 @@ Recettear is being patched as follows:
 					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
 					[CheatTableGenerator]::EndCheatEntry(0)
 
+					[CheatTableGenerator]::BeginCheatEntryForLabel('TextureFreeList?', 0, $True) > $Null
+					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[3]) > $Null
+					[CheatTableGenerator]::Text.Append($GroupHeader) > $Null
+					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[3]) > $Null
+					[CheatTableGenerator]::Text.Append('<CheatEntries>') > $Null
+					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+
+					for ($Index = 0; $Index -lt 200; ++$Index)
+					{
+						$TextureEntryAddress = 0x073a97e8 + $Index * 4
+
+						[CheatTableGenerator]::BeginCheatEntry("TextureEntry?[$Index]", $TextureEntryAddress, 'uint', 4, 2, $True) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[5]) > $Null
+						[CheatTableGenerator]::Text.Append('<ShowAsHex>1</ShowAsHex>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[5]) > $Null
+						[CheatTableGenerator]::Text.Append('<CheatEntries>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::BeginCheatEntry("*TextureEntry?[$Index]", $TextureEntryAddress, 'uint', 4, 4, $False) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[7]) > $Null
+						[CheatTableGenerator]::Text.Append('<ShowAsHex>1</ShowAsHex>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[7]) > $Null
+						[CheatTableGenerator]::Text.Append('<Offsets><Offset>0</Offset></Offsets>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::EndCheatEntry(4)
+						[CheatTableGenerator]::BeginCheatEntry("TextureEntry?[$Index]->Width", $TextureEntryAddress, 'uint', 4, 4, $False) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[7]) > $Null
+						[CheatTableGenerator]::Text.Append('<Offsets><Offset>4</Offset></Offsets>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::EndCheatEntry(4)
+						[CheatTableGenerator]::BeginCheatEntry("TextureEntry?[$Index]->Height", $TextureEntryAddress, 'uint', 4, 4, $False) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[7]) > $Null
+						[CheatTableGenerator]::Text.Append('<Offsets><Offset>8</Offset></Offsets>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::EndCheatEntry(4)
+						[CheatTableGenerator]::BeginCheatEntry("TextureEntry?[$Index]->Flags", $TextureEntryAddress, 'uint', 4, 4, $False) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[7]) > $Null
+						[CheatTableGenerator]::Text.Append('<Offsets><Offset>C</Offset></Offsets>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[7]) > $Null
+						[CheatTableGenerator]::Text.Append('<ShowAsHex>1</ShowAsHex>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::EndCheatEntry(4)
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[5]) > $Null
+						[CheatTableGenerator]::Text.Append('</CheatEntries>') > $Null
+						[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+						[CheatTableGenerator]::EndCheatEntry(2)
+					}
+
+					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[3]) > $Null
+					[CheatTableGenerator]::Text.Append('</CheatEntries>') > $Null
+					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::CRLF) > $Null
+					[CheatTableGenerator]::EndCheatEntry(0)
+
 					[CheatTableGenerator]::BeginCheatEntryForLabel('InterpolatedFloats', 0, $True) > $Null
 					[CheatTableGenerator]::Text.Append([CheatTableGenerator]::IndentBy[3]) > $Null
 					[CheatTableGenerator]::Text.Append($GroupHeader) > $Null
