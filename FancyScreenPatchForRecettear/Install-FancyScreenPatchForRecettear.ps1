@@ -6833,7 +6833,8 @@ Recettear is being patched as follows:
 				Preassemble 'PatchData' ($ImageBase + $VirtualAddressOfPatchData) $RawDataOffsetOfPatchData @(
 				'MagicHeader:16:(char[16])', $UTF8.GetBytes('FancyScreenPatch')
 				'HeaderVersion:4', (LittleEndian 4)
-				'HeaderReservedSpace:44', ([Byte[]]::new(44))
+				'FunctionTableAddress:4', (Reserve 4 "LE `${&FunctionTable}")
+				'HeaderReservedSpace:40', ([Byte[]]::new(40))
 
 				'PresentationFrameTiming:'
 				'PresentationFrameTime:4', (LE 0)
@@ -6915,6 +6916,11 @@ Recettear is being patched as follows:
 				'SkipUIStuffReplacement:4', (LE 0)
 				'Anchor2DToBottom:4', (LE 0)
 				'BlackBarFlags:4', (LE 0)
+
+					foreach ($BlackBar in $BlackBars)
+					{
+					"DisablementOf${BlackBar}Counter:4", (LE 0)
+					}
 
 				'4f:4:(float)', (LE ([Float] 4))
 				'12f:4:(float)', (LE ([Float] 12))
@@ -7038,6 +7044,41 @@ Recettear is being patched as follows:
 				'TwoPixelWidthRight:4:(float)', (LE ([Float] $TwoPixelWidthRight))
 
 				'LoadingDiscSpinRate:4:(float)', (LE ([Float] $LoadingDiscSpinRate))
+
+				'FunctionTable:'
+				'FunctionTableLength:4', (LE ($BlackBars.Count * 2))
+				'FunctionTableFunctionsAddress:4', (Reserve 4 "LE `${&FunctionTableFunctions}")
+				'FunctionTableNamesAddress:4', (Reserve 4 "LE `${&FunctionTableNames}")
+
+				'FunctionTableFunctions:'
+					$($FunctionTableFunctionCounter = 0)
+
+					foreach ($BlackBar in $BlackBars)
+					{
+					"FunctionTableFunction[$(($FunctionTableFunctionCounter++))]:4", (Reserve 4 "LE (`${&StartDisabling$BlackBar} + `$ImageBase)")
+					}
+
+					foreach ($BlackBar in $BlackBars)
+					{
+					"FunctionTableFunction[$(($FunctionTableFunctionCounter++))]:4", (Reserve 4 "LE (`${&StopDisabling$BlackBar} + `$ImageBase)")
+					}
+
+				'FunctionTableNames:'
+					$($FunctionTableNameCounter = 0)
+
+					foreach ($BlackBar in $BlackBars)
+					{
+						$Length = 14 + $BlackBar.Length
+					"FunctionTableName[$(($FunctionTableNameCounter++))]:${Length}:(char[$Length])", $UTF8.GetBytes("startDisabling${BlackBar}"), 0
+					}
+
+					foreach ($BlackBar in $BlackBars)
+					{
+						$Length = 13 + $BlackBar.Length
+					"FunctionTableName[$(($FunctionTableNameCounter++))]:${Length}:(char[$Length])", $UTF8.GetBytes("stopDisabling${BlackBar}"), 0
+					}
+
+					{[Byte[]]::new(4 - ($Offset -band 3))}
 
 				'ShouldEnableVerticalSync:4', (LE 0)
 
