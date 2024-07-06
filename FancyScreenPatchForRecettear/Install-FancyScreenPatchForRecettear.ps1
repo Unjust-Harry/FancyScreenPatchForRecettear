@@ -6832,7 +6832,7 @@ Recettear is being patched as follows:
 
 				Preassemble 'PatchData' ($ImageBase + $VirtualAddressOfPatchData) $RawDataOffsetOfPatchData @(
 				'MagicHeader:16:(char[16])', $UTF8.GetBytes('FancyScreenPatch')
-				'HeaderVersion:4', (LittleEndian 4)
+				'HeaderVersion:4', (LittleEndian 5)
 				'FunctionTableAddress:4', (Reserve 4 "LE `${&FunctionTable}")
 				'HeaderReservedSpace:40', ([Byte[]]::new(40))
 
