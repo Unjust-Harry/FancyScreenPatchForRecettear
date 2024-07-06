@@ -1724,7 +1724,7 @@ function Get-RecettearInstallations
 
 $RecettearExecutable = if ($Null -eq $Script:RecettearExecutablePath)
 {
-	$DetectedInstallations = Get-RecettearInstallations
+	$DetectedInstallations = @(Get-RecettearInstallations)
 
 	if ($Script:NonInteractive)
 	{
@@ -2101,7 +2101,7 @@ Use-Disposable $(
 	{
 		if ($Null -eq $DetectedInstallations)
 		{
-			$Script:DetectedInstallations = Get-RecettearInstallations
+			$Script:DetectedInstallations = @(Get-RecettearInstallations)
 		}
 
 		foreach ($DetectedInstallation in $DetectedInstallations)
@@ -5341,7 +5341,7 @@ Use-Disposable $(
 		Update-ConfigurationDependentValues
 
 		$Information = [Ordered] @{
-			DetectedInstallations = Get-RecettearInstallations
+			DetectedInstallations = @(Get-RecettearInstallations)
 			UsingIntegral2DScaling = $Script:UsingIntegral2DScaling
 			DrawDistanceMultiplier = $DrawDistanceMultiplier
 			PartiallyResolvedEffectiveConfiguration = $PartiallyResolvedEffectiveConfiguration
