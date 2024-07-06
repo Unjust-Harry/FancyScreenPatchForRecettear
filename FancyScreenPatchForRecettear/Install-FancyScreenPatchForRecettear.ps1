@@ -6363,7 +6363,7 @@ Recettear is being patched as follows:
 					DisplacementFrom (FileOffsetToVirtualAddress ($CodeOffset + $CallOffset + 5)) -To $FunctionOffset
 				}
 
-				function Reserve ([UInt32] $ByteCount, [ScriptBlock] $For)
+				function Reserve ([UInt32] $ByteCount, [Object] $For)
 				{
 					[ValueTuple[UInt32, Object]]::new($ByteCount, $For)
 				}
