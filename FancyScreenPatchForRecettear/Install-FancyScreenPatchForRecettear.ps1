@@ -10199,8 +10199,8 @@ Recettear is being patched as follows:
 					'PostDrawingOfRightPillarbox:'
 						if ($Script:UsingIntegral2DScaling)
 						{
-							0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x04, 0x00, 0x00, 0x00 <# test [&BlackBarFlags], 0b0100 #>
-							0x74, '1:PostDrawingOfUpperLetterbox'                         <# jz PostDrawingOfUpperLetterbox #>
+							0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x04, 0x00, 0x00, 0x00    <# test [&BlackBarFlags], 0b0100 #>
+							0x74, '1:PostDrawingOfUpperLetterbox'                            <# jz PostDrawingOfUpperLetterbox #>
 							0x83, (ModRM 0 7 5), '&DisablementOfUpperLetterboxCounter', 0x00 <# cmp [&DisablementOfUpperLetterboxCounter], 0 #>
 							0x75, '1:PostDrawingOfUpperLetterbox'                            <# jne PostDrawingOfUpperLetterbox #>
 							(& $EnqueueBlackBar 0 0 $2DScaledBaseWidth $2DLetterboxHeight)
@@ -10208,8 +10208,8 @@ Recettear is being patched as follows:
 					'PostDrawingOfUpperLetterbox:'
 						if ($Script:UsingIntegral2DScaling)
 						{
-							0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x08, 0x00, 0x00, 0x00 <# test [&BlackBarFlags], 0b1000 #>
-							0x74, '1:PostDrawingOfLowerLetterbox'                         <# jz PostDrawingOfLowerLetterbox #>
+							0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x08, 0x00, 0x00, 0x00    <# test [&BlackBarFlags], 0b1000 #>
+							0x74, '1:PostDrawingOfLowerLetterbox'                            <# jz PostDrawingOfLowerLetterbox #>
 							0x83, (ModRM 0 7 5), '&DisablementOfLowerLetterboxCounter', 0x00 <# cmp [&DisablementOfLowerLetterboxCounter], 0 #>
 							0x75, '1:PostDrawingOfLowerLetterbox'                            <# jne PostDrawingOfLowerLetterbox #>
 							(& $EnqueueBlackBar 0 ($GameBaseHeight + $2DLetterboxHeight) $2DScaledBaseWidth $2DLetterboxHeight)
