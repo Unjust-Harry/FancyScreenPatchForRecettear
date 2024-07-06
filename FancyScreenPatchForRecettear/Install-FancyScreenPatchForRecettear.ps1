@@ -6827,6 +6827,9 @@ Recettear is being patched as follows:
 				$TwoPixelWidthRight = $GameBaseWidth - 2
 
 
+				$BlackBars = 'LeftPillarbox', 'RightPillarbox', 'UpperLetterbox', 'LowerLetterbox'
+
+
 				Preassemble 'PatchData' ($ImageBase + $VirtualAddressOfPatchData) $RawDataOffsetOfPatchData @(
 				'MagicHeader:16:(char[16])', $UTF8.GetBytes('FancyScreenPatch')
 				'HeaderVersion:4', (LittleEndian 4)
@@ -10184,16 +10187,22 @@ Recettear is being patched as follows:
 
 						0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x01, 0x00, 0x00, 0x00         <# test [&BlackBarFlags], 0b0001 #>
 						0x74, '1:PostDrawingOfLeftPillarbox'                                  <# jz PostDrawingOfLeftPillarbox #>
+						0x83, (ModRM 0 7 5), '&DisablementOfLeftPillarboxCounter', 0x00       <# cmp [&DisablementOfLeftPillarboxCounter], 0 #>
+						0x75, '1:PostDrawingOfLeftPillarbox'                                  <# jne PostDrawingOfLeftPillarbox #>
 						(& $EnqueueBlackBar 0 0 $2DPillarboxWidth $2DScaledBaseHeight)
 					'PostDrawingOfLeftPillarbox:'
 						0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x02, 0x00, 0x00, 0x00         <# test [&BlackBarFlags], 0b0010 #>
 						0x74, '1:PostDrawingOfRightPillarbox'                                 <# jz PostDrawingOfRightPillarbox #>
+						0x83, (ModRM 0 7 5), '&DisablementOfRightPillarboxCounter', 0x00      <# cmp [&DisablementOfRightPillarboxCounter], 0 #>
+						0x75, '1:PostDrawingOfRightPillarbox'                                 <# jne PostDrawingOfRightPillarbox #>
 						(& $EnqueueBlackBar ($GameBaseWidth + $2DPillarboxWidth) 0 $2DPillarboxWidth $2DScaledBaseHeight)
 					'PostDrawingOfRightPillarbox:'
 						if ($Script:UsingIntegral2DScaling)
 						{
 							0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x04, 0x00, 0x00, 0x00 <# test [&BlackBarFlags], 0b0100 #>
 							0x74, '1:PostDrawingOfUpperLetterbox'                         <# jz PostDrawingOfUpperLetterbox #>
+							0x83, (ModRM 0 7 5), '&DisablementOfUpperLetterboxCounter', 0x00 <# cmp [&DisablementOfUpperLetterboxCounter], 0 #>
+							0x75, '1:PostDrawingOfUpperLetterbox'                            <# jne PostDrawingOfUpperLetterbox #>
 							(& $EnqueueBlackBar 0 0 $2DScaledBaseWidth $2DLetterboxHeight)
 						}
 					'PostDrawingOfUpperLetterbox:'
@@ -10201,6 +10210,8 @@ Recettear is being patched as follows:
 						{
 							0xF7, (ModRM 0 0 5), '&BlackBarFlags', 0x08, 0x00, 0x00, 0x00 <# test [&BlackBarFlags], 0b1000 #>
 							0x74, '1:PostDrawingOfLowerLetterbox'                         <# jz PostDrawingOfLowerLetterbox #>
+							0x83, (ModRM 0 7 5), '&DisablementOfLowerLetterboxCounter', 0x00 <# cmp [&DisablementOfLowerLetterboxCounter], 0 #>
+							0x75, '1:PostDrawingOfLowerLetterbox'                            <# jne PostDrawingOfLowerLetterbox #>
 							(& $EnqueueBlackBar 0 ($GameBaseHeight + $2DLetterboxHeight) $2DScaledBaseWidth $2DLetterboxHeight)
 						}
 					'PostDrawingOfLowerLetterbox:'
@@ -10251,6 +10262,24 @@ Recettear is being patched as follows:
 						#Preassemble 'PositionHealthBarHorizontally' (${&DrawAdventurerHUD} + 854) (${@DrawAdventurerHUD} + 854) @('&HUDHealthBarXOffset')
 						#Preassemble 'PositionHealthBarVertically' (${&DrawAdventurerHUD} + 872) (${@DrawAdventurerHUD} + 872) @('&HUDHealthBarYOffset')
 						#Preassemble 'PositionSPBarVertically' (${&DrawAdventurerHUD} + 1032) (${@DrawAdventurerHUD} + 1032) @('&HUDSPBarYOffset')
+					}
+
+					foreach ($BlackBar in $BlackBars)
+					{
+						Preassemble "StartDisabling$BlackBar" @(
+							(Get-Nop 5)                                                   <# nop #>
+							0xF0, 0xFF, (ModRM 0 0 5), "&DisablementOf${BlackBar}Counter" <# lock inc [&DisablementOf${BlackBar}Counter] #>
+							0xC3                                                          <# ret #>
+						)
+					}
+
+					foreach ($BlackBar in $BlackBars)
+					{
+						Preassemble "StopDisabling$BlackBar" @(
+							(Get-Nop 5)                                                   <# nop #>
+							0xF0, 0xFF, (ModRM 0 1 5), "&DisablementOf${BlackBar}Counter" <# lock dec [&DisablementOf${BlackBar}Counter] #>
+							0xC3                                                          <# ret #>
+						)
 					}
 				}
 
